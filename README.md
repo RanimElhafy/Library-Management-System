@@ -87,7 +87,7 @@ The system ensures secure interactions through **input validation, role-based ac
 ---
 ## **📂 Database Structure**
 
-'./DatabaseDiagram.png';
+![Database Diagram]('./images/DatabaseDiagram.png')
 
 
 
