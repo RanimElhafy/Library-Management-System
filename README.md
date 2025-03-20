@@ -76,6 +76,14 @@ The system ensures secure interactions through **input validation, role-based ac
 ## **Threats and Mitigations**
 **STRIDE Model**
 
+| Threat                 | Description                                  |Mitigation                                  |
+|---------------------------|---------------------------------------------|---------------------------------------------|
+| **Spoofing**              | Unauthorized login attempts  | Implement strong authentication, account lockout mechanism |
+| **Tampering**             | Altering book records     | Use role-based access control (RBAC) and audit logs |
+| **Repudiation**           | Denying actions performed              | Maintain transaction logs |
+| **Information Disclosure**| Exposing member details     | Encrypt sensitive data |
+| **Denial of Service (DoS)**| System overload due to excessive requests   | Implement rate limiting |
+| **Privilege Escalation**  | Librarian escalating privileges to admin   | Use least privilege principle |
 ---
 ## **📂 Database Structure**
 
