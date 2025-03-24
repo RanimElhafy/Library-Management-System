@@ -7,7 +7,6 @@ public class App extends Application {
     public void start(Stage primaryStage) {
         LoginInterface login = new LoginInterface(primaryStage);
         login.initializeComponents();
-        DBLogger.log("DEBUG", "LoginInterface", "Login Interface is shown Successfully!!", null);
     }
     
     public static void main(String[] args) {
