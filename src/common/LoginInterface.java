@@ -1,16 +1,19 @@
 package common;
-import Librarian.LibInterface;
-import Administrator.AdminInterface;
-import Member.MemInterface;
 
-import java.sql.*;
+import administrator.AdminInterface;
+import librarian.LibInterface;
+import member.MemInterface;
+
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import javafx.scene.text.*;
+
+import java.sql.*;
 
 public class LoginInterface {
     private Scene loginScene;
@@ -33,9 +36,7 @@ public class LoginInterface {
         Label passwordLabel = new Label("Password:");
         Button loginButton = new Button("Login");
 
-        Font font = Font.font("Arial", FontWeight.BOLD, 14);
-        welcomeLabel.setFont(font);
-
+        welcomeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         loginButton.setOnAction((ActionEvent event) -> authenticate());
 
         loginLayout.add(welcomeLabel, 1, 0);
@@ -45,53 +46,82 @@ public class LoginInterface {
         loginLayout.add(passwordField, 1, 2);
         loginLayout.add(loginButton, 1, 3);
 
-        loginScene = new Scene(loginLayout, 600, 200);
+        loginScene = new Scene(loginLayout, 600, 250);
         stage.setTitle("User Login");
         stage.setScene(loginScene);
         stage.show();
     }
 
     private void authenticate() {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
-        Connection con = DBUtils.establishConnection();
-        String query = "SELECT * FROM users WHERE username = ?";
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText().trim();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            showAlert("Input Error", "Please enter both username and password.");
+            return;
+        }
+
+        validateUserLogin(username, password);
+    }
+
+    private void validateUserLogin(String username, String enteredPassword) {
+        Connection con = DBUtils.establishConnection(); // Uses root
         try {
-            PreparedStatement statement = con.prepareStatement(query);
-            statement.setString(1, username);
-            ResultSet rs = statement.executeQuery();
+            String query = "SELECT PasswordHash, Salt, Role FROM users WHERE Username = ?";
+            PreparedStatement stmt = con.prepareStatement(query);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                String role = rs.getString("role");
-                DBUtils.closeConnection(con, statement);
-                con = DBUtils.setUser(role);
-                navigateToRoleInterface(role, username, con);
+                String storedHash = rs.getString("PasswordHash");
+                String storedSalt = rs.getString("Salt");
+                String role = rs.getString("Role");
+
+                hashing hasher = new hashing(enteredPassword);
+                String generatedHash = hasher.generateHash(storedSalt);
+
+                if (storedHash.equals(generatedHash)) {
+                    navigateToRoleInterface(role.toLowerCase(), username, con);
+                    return;
+                } else {
+                    showAlert("Login Failed", "Incorrect password.");
+                }
             } else {
-                showAlert("Login Failed", "Invalid username or password.");
+                showAlert("Login Failed", "User not found.");
             }
+
+            rs.close();
+            stmt.close();
+            DBUtils.closeConnection(con, stmt);
+
         } catch (Exception e) {
-            showAlert("Database Error", "Failed to connect to the database.");
+            e.printStackTrace();
+            showAlert("Database Error", "An error occurred while connecting.");
         }
     }
 
     private void navigateToRoleInterface(String role, String username, Connection con) {
-        if (role.equals("librarian")) {
-            LibInterface libInterface = new LibInterface(stage, username, con);
-            libInterface.initializeComponents();
-        } else if (role.equals("admin")) {
-            AdminInterface adminInterface = new AdminInterface(stage, username, con);
-            adminInterface.initializeComponents();
-        } else if (role.equals("member")) {
-            MemInterface memInterface = new MemInterface(stage, username, con);
-            memInterface.initializeComponents();
+        switch (role) {
+            case "admin":
+                new AdminInterface(stage, username, con).initializeComponents();
+                break;
+            case "librarian":
+                new LibInterface(stage, username, con).initializeComponents();
+                break;
+            case "member":
+                new MemInterface(stage, username, con).initializeComponents();
+                break;
+            default:
+                showAlert("Access Error", "Unrecognized role: " + role);
+                DBUtils.closeConnection(con, null);
         }
     }
 
-    private void showAlert(String title, String content) {
+    private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText(content);
+        alert.setContentText(message);
         alert.showAndWait();
     }
 }
