@@ -30,7 +30,7 @@ public class hashing {
     }
 
     // Generates hash with provided salt
-    public String generateHashWithSalt() throws NoSuchAlgorithmException {
+    public String generateHashWithSalt(String password, String salt) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         digest.update(salt.getBytes());
         byte[] hash = digest.digest(password.getBytes());
