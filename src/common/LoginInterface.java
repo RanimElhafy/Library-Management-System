@@ -1,6 +1,7 @@
 package common;
 
 import administrator.AdminInterface;
+import administrator.User;
 import librarian.LibInterface;
 import member.MemInterface;
 
@@ -14,6 +15,8 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoginInterface {
     private Scene loginScene;
@@ -78,7 +81,7 @@ public class LoginInterface {
                 String role = rs.getString("Role");
 
                 hashing hasher = new hashing(enteredPassword);
-                String generatedHash = hasher.generateHash(storedSalt);
+                String generatedHash = hasher.generateHashWithSalt(enteredPassword, storedSalt);
 
                 if (storedHash.equals(generatedHash)) {
                     navigateToRoleInterface(role.toLowerCase(), username, con);
@@ -103,7 +106,8 @@ public class LoginInterface {
     private void navigateToRoleInterface(String role, String username, Connection con) {
         switch (role) {
             case "admin":
-                new AdminInterface(stage, username, con).initializeComponents();
+                List<User> userList = loadUserList(con);
+                new AdminInterface(stage, username, con, userList).initializeComponents();
                 break;
             case "librarian":
                 new LibInterface(stage, username, con).initializeComponents();
@@ -116,6 +120,29 @@ public class LoginInterface {
                 DBUtils.closeConnection(con, null);
         }
     }
+    private List<User> loadUserList(Connection con) {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT Username, IsLocked FROM users";
+    
+        try (PreparedStatement stmt = con.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+    
+            while (rs.next()) {
+                String username = rs.getString("Username");
+                boolean isLocked = rs.getBoolean("IsLocked");
+    
+                User user = new User(username);
+                user.setLocked(isLocked);
+                users.add(user);
+            }
+    
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    
+        return users;
+    }    
+    
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
