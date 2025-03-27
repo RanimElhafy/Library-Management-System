@@ -20,19 +20,20 @@ public class LibraryFunctions {
     public String getMembershipType(int memberID) throws SQLException {
         String membershipType = "";
         try {
-            String query = "SELECT MembershipType FROM library_members WHERE MemberID = ?";
+            String query = "SELECT MembershipType FROM members WHERE MemberID = ?";
             PreparedStatement statement = con.prepareStatement(query);
             statement.setInt(1, memberID);
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {
-                DBLogger.log("INFO", "LibraryFunctions", "Membership type fetched.", username);
+                DBLogger.log("INFO", "LibraryFunctions", "Fetched MembershipType from members.", username);
                 membershipType = rs.getString("MembershipType");
             }
+
             rs.close();
             statement.close();
         } catch (SQLException e) {
-            DBLogger.log("ERROR", "LibraryFunctions", "Error fetching membership type.", username);
+            DBLogger.log("ERROR", "LibraryFunctions", "Failed to fetch MembershipType.", username);
             e.printStackTrace();
         }
         return membershipType;
