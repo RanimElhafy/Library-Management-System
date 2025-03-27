@@ -3,7 +3,7 @@ package common;
 public class HashGenerator {
     public static void main(String[] args) {
         try {
-            String password = "libpass"; // Change this as needed
+            String password = "emilypass"; // Change this as needed
             hashing hasher = new hashing(password);
             String[] result = hasher.generateHash();
 
