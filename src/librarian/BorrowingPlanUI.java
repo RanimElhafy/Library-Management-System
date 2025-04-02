@@ -47,3 +47,4 @@ public class BorrowingPlanUI {
         layout.add(assignButton, 0, 2);
     }
 }
+  
