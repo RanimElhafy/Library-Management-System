@@ -131,6 +131,15 @@ public class AdminInterface {
                     stmt.setString(3, salt);
                     stmt.executeUpdate();
 
+                    // Insert into members table
+                    String insertMember = "INSERT INTO members (Name, ContactInfo, MembershipType, RegistrationDate, MembershipExpiry, RoleID) VALUES (?, ?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR), ?)";
+                    PreparedStatement memberStmt = connection.prepareStatement(insertMember);
+                    memberStmt.setString(1, newUsername); // You may update to accept full name instead
+                    memberStmt.setString(2, newUsername); // Assuming ContactInfo is same as username
+                    memberStmt.setString(3, "Regular");   // default membership
+                    memberStmt.setInt(4, 3);              // RoleID for members
+                    memberStmt.executeUpdate();
+
                     User newUser = new User(newUsername);
                     users.add(newUser);
                     userList.getItems().add(newUser);
