@@ -2,7 +2,7 @@ package common;
 
 import administrator.AdminInterface;
 import administrator.User;
-import librarian.LibInterface;
+import librarian.LibrarianInterface;
 import member.MemInterface;
 
 import javafx.event.ActionEvent;
@@ -87,10 +87,10 @@ public class LoginInterface {
                     navigateToRoleInterface(role.toLowerCase(), username, con);
                     return;
                 } else {
-                    showAlert("Login Failed", "Incorrect password.");
+                    showAlert("Login Failed", "Incorrect username or password.");
                 }
             } else {
-                showAlert("Login Failed", "User not found.");
+                showAlert("Login Failed", "Incorrect username or password.");
             }
 
             rs.close();
@@ -110,7 +110,7 @@ public class LoginInterface {
                 new AdminInterface(stage, username, con, userList).initializeComponents();
                 break;
             case "librarian":
-                new LibInterface(stage, username, con).initializeComponents();
+                new LibrarianInterface(stage, username, con).initializeComponents();
                 break;
             case "member":
                 new MemInterface(stage, username, con).initializeComponents();
