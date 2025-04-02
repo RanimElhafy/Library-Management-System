@@ -1,10 +1,8 @@
-package librarian;
+package member;
 
 import java.sql.*;
-import javafx.event.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import common.DBLogger;
 
 public class InsertReadingProgress {
     private Connection con;
