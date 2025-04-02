@@ -1,4 +1,4 @@
-package librarian;
+package member;
 
 import java.sql.*;
 import javafx.scene.control.*;
