@@ -3,7 +3,7 @@ package common;
 import administrator.AdminInterface;
 import administrator.User;
 import librarian.LibrarianInterface;
-import member.MemInterface;
+import librarian_assistant.LibrarianAssistantInterface;
 
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
@@ -112,8 +112,8 @@ public class LoginInterface {
             case "librarian":
                 new LibrarianInterface(stage, username, con).initializeComponents();
                 break;
-            case "member":
-                new MemInterface(stage, username, con).initializeComponents();
+            case "assistant":
+                new LibrarianAssistantInterface(stage, username, con).initializeComponents();
                 break;
             default:
                 showAlert("Access Error", "Unrecognized role: " + role);
