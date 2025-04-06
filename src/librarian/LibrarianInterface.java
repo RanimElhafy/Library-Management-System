@@ -1,10 +1,11 @@
 package librarian;
 
+import librarian_assistant.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.sql.Connection;
@@ -15,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LibrarianInterface {
-    private Stage stage;
-    private String librarianUsername;
-    private Connection connection;
+    private final Stage stage;
+    private final String librarianUsername;
+    private final Connection connection;
 
     public LibrarianInterface(Stage stage, String librarianUsername, Connection connection) {
         this.stage = stage;
@@ -40,39 +41,24 @@ public class LibrarianInterface {
         Button logoutBtn = new Button("Logout");
 
         registerMemberBtn.setOnAction(e -> {
-            try {
-                RegisterLibraryMemberUI registerUI = new RegisterLibraryMemberUI(connection, librarianUsername);
-                registerUI.display();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                showAlert("Error", "Error loading Register Member interface: " + ex.getMessage());
-            }
+            RegisterLibraryMemberUI registerUI = new RegisterLibraryMemberUI(connection, librarianUsername);
+            registerUI.display();
         });
 
         renewMembershipBtn.setOnAction(e -> {
-            try {
-                Stage renewStage = new Stage();
-                RenewLibraryMembership renewUI = new RenewLibraryMembership(connection, librarianUsername);
-                renewStage.setScene(new Scene(renewUI.layout, 400, 250));
-                renewStage.setTitle("Renew Membership");
-                renewStage.show();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                showAlert("Error", "Error loading Renew Membership interface: " + ex.getMessage());
-            }
+            RenewLibraryMembership renewUI = new RenewLibraryMembership(connection, librarianUsername);
+            Stage renewStage = new Stage();
+            renewStage.setScene(new Scene(renewUI.layout, 400, 250));
+            renewStage.setTitle("Renew Membership");
+            renewStage.show();
         });
 
         borrowBookBtn.setOnAction(e -> {
-            try {
-                Stage borrowStage = new Stage();
-                BorrowingPlanUI borrowUI = new BorrowingPlanUI(connection, librarianUsername);
-                borrowStage.setScene(new Scene(borrowUI.layout, 400, 250));
-                borrowStage.setTitle("Record Borrowing");
-                borrowStage.show();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                showAlert("Error", "Error loading Record Borrowing interface: " + ex.getMessage());
-            }
+            BorrowingPlanUI borrowUI = new BorrowingPlanUI(connection, librarianUsername);
+            Stage borrowStage = new Stage();
+            borrowStage.setScene(new Scene(borrowUI.layout, 400, 250));
+            borrowStage.setTitle("Record Borrowing");
+            borrowStage.show();
         });
 
         calculateFineBtn.setOnAction(e -> {
@@ -82,53 +68,29 @@ public class LibrarianInterface {
             dialog.setContentText("Member ID:");
 
             dialog.showAndWait().ifPresent(input -> {
-                try {
-                    int memberId = Integer.parseInt(input);
-                    FineCalculator calculator = new FineCalculator(connection, librarianUsername);
-                    calculator.calculateFineForMember(memberId);
-                } catch (NumberFormatException ex) {
-                    showAlert("Input Error", "Please enter a valid numeric Member ID.");
-                }
+                int memberId = Integer.parseInt(input);
+                FineCalculator calculator = new FineCalculator(connection, librarianUsername);
+                calculator.calculateFineForMember(memberId);
             });
         });
 
         updateMemberBtn.setOnAction(e -> {
-            try {
-                UpdateMemberInfoUI updateUI = new UpdateMemberInfoUI(connection, librarianUsername);
-                updateUI.display();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                showAlert("Error", "Error loading Update Member Info interface.");
-            }
+            UpdateMemberInfoUI updateUI = new UpdateMemberInfoUI(connection, librarianUsername);
+            updateUI.display();
         });
 
         manageBooksBtn.setOnAction(e -> {
-            try {
-                BookInventoryUI bookUI = new BookInventoryUI(connection, librarianUsername);
-                bookUI.display();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                showAlert("Error", "Error loading Book Inventory interface.");
-            }
+            BookInventoryUI bookUI = new BookInventoryUI(connection, librarianUsername);
+            bookUI.display();
         });
 
         scheduleMaintenanceBtn.setOnAction(e -> {
-            try {
-                ScheduleMaintenanceUI maintenanceUI = new ScheduleMaintenanceUI(connection, librarianUsername);
-                maintenanceUI.display();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                showAlert("Error", "Error loading Schedule Maintenance interface.");
-            }
+            ScheduleMaintenanceUI maintenanceUI = new ScheduleMaintenanceUI(connection, librarianUsername);
+            maintenanceUI.display();
         });
 
         viewLogsBtn.setOnAction(e -> {
-            try {
-                showSystemLogs(getSystemLogs());
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                showAlert("Error", "Error loading logs: " + ex.getMessage());
-            }
+            showSystemLogs(getSystemLogs());
         });
 
         logoutBtn.setOnAction(e -> stage.close());
@@ -155,15 +117,6 @@ public class LibrarianInterface {
         stage.show();
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    // Display system logs clearly
     private void showSystemLogs(List<String> logs) {
         Stage logStage = new Stage();
         logStage.setTitle("System Logs");
@@ -180,7 +133,6 @@ public class LibrarianInterface {
         logStage.show();
     }
 
-    // Fetch system logs securely
     private List<String> getSystemLogs() {
         List<String> logs = new ArrayList<>();
         String query = "SELECT Timestamp, Action FROM logs ORDER BY Timestamp DESC";
@@ -193,6 +145,7 @@ public class LibrarianInterface {
         } catch (SQLException e) {
             logs.add("Error retrieving logs: " + e.getMessage());
         }
+
         return logs;
     }
 }
