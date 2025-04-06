@@ -1,14 +1,10 @@
 package librarian;
 
-import common.DBLogger;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import javafx.scene.layout.*;
+import java.sql.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class RenewLibraryMembership {
     public GridPane layout;
@@ -16,38 +12,38 @@ public class RenewLibraryMembership {
     private String username;
 
     public RenewLibraryMembership(Connection con, String username) {
-        layout = new GridPane();
         this.con = con;
         this.username = username;
         addComponents();
     }
 
     private void addComponents() {
-        layout.setVgap(10);
+        layout = new GridPane();
         layout.setHgap(10);
+        layout.setVgap(10);
 
         Label memberIdLabel = new Label("Member ID:");
-        Spinner<Integer> memberIdField = new Spinner<>();
-        memberIdField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, getMaxMemberID()));
-        memberIdField.setEditable(true);
+        Spinner<Integer> memberIdSpinner = new Spinner<>();
+        memberIdSpinner.setEditable(true);
+        memberIdSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, getMaxMemberID()));
 
         Label typeLabel = new Label("New Membership Type:");
         ComboBox<String> typeComboBox = new ComboBox<>();
-        typeComboBox.getItems().addAll("Regular", "Premium");
+        typeComboBox.getItems().addAll("Basic", "Premium", "Student");
 
         Button renewButton = new Button("Renew Membership");
-
         renewButton.setOnAction(e -> {
+            int memberId = memberIdSpinner.getValue();
+            String type = typeComboBox.getValue();
             try {
-                renewMembership(memberIdField.getValue(), typeComboBox.getValue());
+                renewMembership(memberId, type);
             } catch (SQLException ex) {
-                DBLogger.log("ERROR", "RenewLibraryMembership", "Membership renewal failed (SQL)", username);
                 ex.printStackTrace();
             }
         });
 
         layout.add(memberIdLabel, 0, 0);
-        layout.add(memberIdField, 1, 0);
+        layout.add(memberIdSpinner, 1, 0);
         layout.add(typeLabel, 0, 1);
         layout.add(typeComboBox, 1, 1);
         layout.add(renewButton, 0, 2);
@@ -55,54 +51,51 @@ public class RenewLibraryMembership {
 
     private void renewMembership(int memberId, String type) throws SQLException {
         if (type == null || type.isEmpty() || !validateMemberExists(memberId)) {
-            showAlert("Invalid Input", "Please provide a valid Member ID and select a membership type.");
+            showAlert("Input Error", "Provide valid Member ID and Membership Type");
             return;
         }
 
-        LocalDate newExpiry;
-        switch (type) {
-            case "Regular": newExpiry = LocalDate.now().plusMonths(6); break;
-            case "Premium": newExpiry = LocalDate.now().plusYears(1); break;
-            default: showAlert("Invalid Type", "Unknown membership type."); return;
-        }
+        String updateQuery = "UPDATE members SET MembershipType = ?, MembershipExpiry = ? WHERE MemberID = ?";
+        PreparedStatement stmt = con.prepareStatement(updateQuery);
+        stmt.setString(1, type);
+        stmt.setString(2, LocalDate.now().plusMonths(6).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        stmt.setInt(3, memberId);
+        stmt.executeUpdate();
 
-        AfterRegistration after = new AfterRegistration(con, "", "", "", newExpiry, memberId, -1, 0, type, username);
-        after.renewMembership();
-
-        DBLogger.log("INFO", "RenewLibraryMembership", "Membership renewed for MemberID: " + memberId, username);
+        showInfo("Success", "Membership renewed for MemberID: " + memberId);
     }
 
-    private boolean validateMemberExists(int memberId) {
-        try {
-            String query = "SELECT MemberID FROM members WHERE MemberID = ?";
-            PreparedStatement stmt = con.prepareStatement(query);
-            stmt.setInt(1, memberId);
-            ResultSet rs = stmt.executeQuery();
-            return rs.next();
-        } catch (SQLException e) {
-            DBLogger.log("ERROR", "RenewLibraryMembership", "Failed to validate MemberID.", username);
-            e.printStackTrace();
-            return false;
-        }
+    private boolean validateMemberExists(int memberId) throws SQLException {
+        String query = "SELECT * FROM members WHERE MemberID = ?";
+        PreparedStatement stmt = con.prepareStatement(query);
+        stmt.setInt(1, memberId);
+        ResultSet rs = stmt.executeQuery();
+        return rs.next();
     }
 
     private int getMaxMemberID() {
         try {
-            PreparedStatement stmt = con.prepareStatement("SELECT MAX(MemberID) AS MaxID FROM members");
+            String query = "SELECT MAX(MemberID) as MaxID FROM members";
+            PreparedStatement stmt = con.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) return rs.getInt("MaxID");
         } catch (SQLException e) {
-            DBLogger.log("ERROR", "RenewLibraryMembership", "Failed to fetch max MemberID.", username);
             e.printStackTrace();
         }
         return 1;
     }
 
-    private void showAlert(String title, String content) {
+    private void showAlert(String title, String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
+        alert.setContentText(msg);
+        alert.showAndWait();
+    }
+
+    private void showInfo(String title, String msg) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setContentText(msg);
         alert.showAndWait();
     }
 }
