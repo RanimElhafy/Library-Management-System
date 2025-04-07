@@ -3,7 +3,7 @@ import java.sql.*;
 
 public class DBUtils {
     private static String url = "jdbc:mysql://127.0.0.1:3306/librarymanagement";
-    private static String DBUsername = "root";
+    private static String DBUsername = "aisha";
     private static String DBPassword = "";
 
     public static Connection establishConnection(String username, String password) {
