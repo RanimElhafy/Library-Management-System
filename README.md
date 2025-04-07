@@ -18,7 +18,7 @@ The system ensures secure interactions through **input validation, role-based ac
 - ✅ **Secure Library Management System** with **authentication, authorization, and logging**
 - ✅ **Book lending and returns** with **due date tracking**
 - ✅ **Fine calculation** for overdue books  
-- ✅ **Role-Based Access Control (RBAC)** (Librarians and Administrators)
+- ✅ **Role-Based Access Control (RBAC)** 
 - ✅ **Prepared Statements & Input Validation** to prevent **SQL injection attacks**  
 - ✅ **Logging & Monitoring** to track user activities  
 
@@ -28,9 +28,6 @@ The system ensures secure interactions through **input validation, role-based ac
 2️⃣ **Set up the database server using XAMPP or a MySQL instance.**  
 3️⃣ **Import the provided `.sql` file from `/sample_data/` to create necessary tables.**  
 4️⃣ **Ensure JavaFX is properly configured in your development environment.**  
-
----
-## **📂 Folder Structure**
 
 ---
 ## 📌 Usage Instructions
@@ -43,20 +40,17 @@ The system ensures secure interactions through **input validation, role-based ac
 - Process book checkouts and returns.
 - View and track borrowing history.
 
-### ✅ Members can:
-- Search and view available books.
-- Borrow and return books.
-- View their borrowing history.
+### ✅ Librarian Assistant can:
+- Can view and renew memberships
+- Assign books and track borrowing
+- View fines and member borrowing history
+- Monitor facility status and maintenance
+- 📌 Has **limited permissions** compared to Librarians and Admins.
 
 ### ✅ Administrators can:
 - Manage users (add, lock, or delete).
 - Monitor system logs.
 - Enforce security policies.
-
----
-## **JavaFX Setup Guide**
-📌 **Refer to the JavaFX installation guide** for step-by-step instructions.  
-🎥 **Click the GIF below** to watch a **full demo** of the application.  
 
 ---
 
@@ -67,10 +61,38 @@ The system ensures secure interactions through **input validation, role-based ac
 ---
 ## **Functional & Security Requirements**
 **Functional Use Cases**
+![Use Case](images/UseCaseDiagram.png)
+
+
+
 
 ---
 ## **Secure Design Principles and Threat Modeling**
 **Data Flow Diagrams**
+
+![DFD1](images/DFD1.png)
+
+
+![DFD2](images/DFD2.png)
+
+
+![DFD3](images/DFD3.png)
+
+
+![DFD4](images/DFD4.png)
+
+
+![DFD5](images/DFD5.png)
+
+![DFD6](images/DFD6.png)
+
+
+![DFD7](images/DFD7.png)
+
+
+![DFD8](images/DFD8.png)
+
+
 
 ---
 ## **Threats and Mitigations**
@@ -87,7 +109,8 @@ The system ensures secure interactions through **input validation, role-based ac
 ---
 ## **📂 Database Structure**
 
-![Database Diagram]('images/database.png')
+![Database Diagram](images/DatabaseDiagram.png)
+
 
 
 
