@@ -37,7 +37,19 @@ public class LibrarianInterface {
         Button manageBooksBtn = new Button("Book Inventory");
         Button scheduleMaintenanceBtn = new Button("Schedule Maintenance");
         Button viewLogsBtn = new Button("View Logs");
+        Button returnBookBtn = new Button("Return Book");
         Button logoutBtn = new Button("Logout");
+
+        
+        returnBookBtn.setOnAction(e -> {
+            try {
+                ReturnBookUI returnBookUI = new ReturnBookUI(connection, librarianUsername);
+                returnBookUI.display();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showAlert("Error", "Error loading Return Book interface.");
+            }
+        });
 
         registerMemberBtn.setOnAction(e -> {
             try {
@@ -146,6 +158,7 @@ public class LibrarianInterface {
             manageBooksBtn,
             scheduleMaintenanceBtn,
             viewLogsBtn,
+            returnBookBtn,
             logoutBtn
         );
 
