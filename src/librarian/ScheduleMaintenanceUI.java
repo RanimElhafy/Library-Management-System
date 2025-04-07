@@ -54,7 +54,7 @@ public class ScheduleMaintenanceUI {
                     return;
                 }
 
-                String query = "INSERT INTO maintenance (FacilityID, Description, ScheduledDate) VALUES (?, ?, ?)";
+                String query = "INSERT INTO maintenancerecords (FacilityID, Description, MaintenanceDate) VALUES (?, ?, ?)";
                 PreparedStatement stmt = con.prepareStatement(query);
                 stmt.setInt(1, facilityId);
                 stmt.setString(2, desc);
